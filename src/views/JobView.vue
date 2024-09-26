@@ -2,14 +2,10 @@
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 import BackButton from '@/components/BackButton.vue';
 import { reactive, onMounted } from 'vue';
-import { useRoute, RouterLink, useRouter } from 'vue-router';
-import { useToast } from 'vue-toastification';
-import axios from 'axios';
+import { useRoute, RouterLink } from 'vue-router';
+import jobsData from '../jobs.json'; // Import the jobs JSON data
 
 const route = useRoute();
-const router = useRouter();
-const toast = useToast();
-
 const jobId = route.params.id;
 
 const state = reactive({
@@ -17,29 +13,15 @@ const state = reactive({
   isLoading: true,
 });
 
-const deleteJob = async () => {
-  try {
-    const confirm = window.confirm('Are you sure you want to delete this job?');
-    if (confirm) {
-      await axios.delete(`/api/jobs/${jobId}`);
-      toast.success('Job Deleted Successfully');
-      router.push('/jobs');
-    }
-  } catch (error) {
-    console.error('Error deleting job', error);
-    toast.error('Job Not Deleted');
+// Simulate fetching job from the JSON data
+onMounted(() => {
+  const job = jobsData.jobs.find((j) => j.id === jobId);
+  if (job) {
+    state.job = job;
+  } else {
+    // Handle job not found, maybe redirect or show a message
   }
-};
-
-onMounted(async () => {
-  try {
-    const response = await axios.get(`/api/jobs/${jobId}`);
-    state.job = response.data;
-  } catch (error) {
-    console.error('Error fetching job', error);
-  } finally {
-    state.isLoading = false;
-  }
+  state.isLoading = false; // Set loading to false once the job is fetched
 });
 </script>
 

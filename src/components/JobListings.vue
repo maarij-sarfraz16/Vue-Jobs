@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router';
 import JobListing from './JobListing.vue';
 import { reactive, defineProps, onMounted } from 'vue';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import axios from 'axios';
+import jobsData from '../jobs.json';
 
 defineProps({
   limit: Number,
@@ -14,19 +14,8 @@ defineProps({
 });
 
 const state = reactive({
-  jobs: [],
-  isLoading: true,
-});
-
-onMounted(async () => {
-  try {
-    const response = await axios.get('/api/jobs');
-    state.jobs = response.data;
-  } catch (error) {
-    console.error('Error fetching jobs', error);
-  } finally {
-    state.isLoading = false;
-  }
+  jobs: jobsData.jobs, // Access the jobs array from the imported JSON
+  isLoading: false, // Set loading to false since we're not fetching data asynchronously
 });
 </script>
 
@@ -41,7 +30,7 @@ onMounted(async () => {
         <PulseLoader />
       </div>
 
-      <!-- Shoe job listing when done loading -->
+      <!-- Show job listing when done loading -->
       <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <JobListing
           v-for="job in state.jobs.slice(0, limit || state.jobs.length)"
